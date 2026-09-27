@@ -4,6 +4,7 @@ import com.example.booking.dto.CreateReservationRequest;
 import com.example.booking.dto.ReservationResponse;
 import com.example.booking.entity.ReservationStatus;
 import com.example.booking.entity.User;
+import com.example.booking.exception.BadRequestException;
 import com.example.booking.service.ReservationService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -59,7 +61,7 @@ public class ReservationController {
     )
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Reservations retrieved successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid filter or pagination parameters"),
+        @ApiResponse(responseCode = "400", description = "Invalid pagination, sorting, or filter parameters"),
         @ApiResponse(responseCode = "401", description = "Authentication required")
     })
     @GetMapping
@@ -69,10 +71,18 @@ public class ReservationController {
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
             @PageableDefault(
-                size = 10,
-                sort = "id",
-                direction = Sort.Direction.DESC
+                    size = 10,
+                    sort = "id",
+                    direction = Sort.Direction.DESC
             ) Pageable pageable) {
+
+        validatePageable(pageable);
+
+        if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
+            throw new BadRequestException(
+                    "Minimum price cannot be greater than maximum price."
+            );
+        }
 
         return ResponseEntity.ok(
                 reservationService.getReservations(
@@ -129,5 +139,35 @@ public class ReservationController {
         reservationService.deleteReservation(id, currentUser);
 
         return ResponseEntity.noContent().build();
+    }
+
+    private void validatePageable(Pageable pageable) {
+
+        if (pageable.getPageNumber() < 0) {
+            throw new BadRequestException(
+                    "Page number cannot be negative."
+            );
+        }
+
+        if (pageable.getPageSize() < 1 || pageable.getPageSize() > 100) {
+            throw new BadRequestException(
+                    "Page size must be between 1 and 100."
+            );
+        }
+
+        for (Sort.Order order : pageable.getSort()) {
+            String property = order.getProperty();
+
+            if (!property.equals("id")
+                    && !property.equals("price")
+                    && !property.equals("status")
+                    && !property.equals("startTime")
+                    && !property.equals("endTime")) {
+
+                throw new BadRequestException(
+                        "Invalid sort field: " + property
+                );
+            }
+        }
     }
 }

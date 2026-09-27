@@ -93,8 +93,21 @@ public class SecurityConfig {
                     "/api/resources/**"
                 ).hasAnyRole("USER", "ADMIN")
 
-                // ADMIN only can create/update/delete resources
+                // ADMIN only can create resources
                 .requestMatchers(
+                    HttpMethod.POST,
+                    "/api/resources/**"
+                ).hasRole("ADMIN")
+
+                // ADMIN only can update resources
+                .requestMatchers(
+                    HttpMethod.PUT,
+                    "/api/resources/**"
+                ).hasRole("ADMIN")
+
+                // ADMIN only can delete resources
+                .requestMatchers(
+                    HttpMethod.DELETE,
                     "/api/resources/**"
                 ).hasRole("ADMIN")
 

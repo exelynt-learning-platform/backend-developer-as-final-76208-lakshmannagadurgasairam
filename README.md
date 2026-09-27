@@ -1,174 +1,121 @@
 # Resource Booking API
 
-A secure RESTful Resource Booking System built using **Spring Boot, Java 17, Spring Security, JWT Authentication, Spring Data JPA, Hibernate, and MySQL**.
+Backend Developer Assignment for Exelynt.
 
-The application provides secure resource and reservation management with **JWT authentication and role-based access control (RBAC)**.
+A secure RESTful Resource Booking API built using Spring Boot, Java 17, Spring Security, JWT authentication, MySQL, and Spring Data JPA.
 
 ---
 
 ## 1. Project Overview
 
-The Resource Booking API allows authenticated users to view available resources and create reservations.
+The Resource Booking API allows authenticated users to view resources and create reservations.
 
-The system supports two roles:
+The application supports two roles:
 
-- **ADMIN** – Can manage resources and reservations.
-- **USER** – Can view resources, create reservations, and view only their own reservations.
+* `ADMIN`
+* `USER`
 
-The application uses JWT for stateless authentication and Spring Security for authorization.
+### ADMIN
 
-### Main Domain Objects
+ADMIN users can:
 
-**Resource**
+* Create resources
+* View resources
+* Update resources
+* Delete resources
+* View all reservations
+* Create reservations
+* Update reservation status
+* Delete reservations
 
-A bookable item such as:
+### USER
 
-- Room
-- Vehicle
-- Equipment
+USER users can:
 
-**Reservation**
+* View resources
+* Create reservations
+* View only their own reservations
 
-A booking made by an authenticated user for a resource.
+USER users cannot:
 
----
-
-## 2. Technologies Used
-
-| Technology | Version / Purpose |
-|---|---|
-| Java | 17 |
-| Spring Boot | 3.2.3 |
-| Spring Security | Authentication & Authorization |
-| JWT | Token-based authentication |
-| Spring Data JPA | Database access |
-| Hibernate | ORM |
-| MySQL | Database |
-| Maven | Build and dependency management |
-| Swagger / OpenAPI | API documentation |
-| Lombok | Boilerplate reduction |
-| Bean Validation | Request validation |
+* Create, update, or delete resources
+* Update reservation status
+* Delete reservations
+* Access other users' reservations
 
 ---
 
-## 3. Key Features
+## 2. Technology Stack
 
-### Authentication
-
-- JWT-based login
-- BCrypt password hashing
-- Stateless authentication
-- Token validation using Spring Security
-- Protected API endpoints
-
-### Authorization
-
-- ADMIN and USER roles
-- Role-based endpoint access
-- USER can access only their own reservations
-- ADMIN can access all reservations
-- Unauthorized requests return appropriate HTTP status codes
-
-### Resource Management
-
-- Create resource
-- View all resources
-- View resource by ID
-- Update resource
-- Delete resource
-- Pagination support
-
-### Reservation Management
-
-- Create reservation
-- View reservations
-- ADMIN can view all reservations
-- USER can view only their own reservations
-- Update reservation status
-- Delete reservation
-- Reservation status support
-- Price filtering
-- Status filtering
-- Pagination
-- Sorting
-
-### Validation
-
-- Required field validation
-- Price validation
-- Resource existence validation
-- Reservation time validation
-- Start/end time validation
-- Invalid requests return HTTP 400
-
-### Error Handling
-
-The application provides centralized exception handling for:
-
-- Resource not found
-- Invalid credentials
-- Access denied
-- Validation errors
-- Unexpected server errors
+* Java 17+
+* Spring Boot 3.2.3
+* Spring Security
+* JWT
+* Spring Data JPA
+* Hibernate
+* MySQL
+* Maven
+* Swagger / OpenAPI
+* Lombok
+* Jakarta Bean Validation
 
 ---
 
-## 4. Project Structure
+## 3. Project Structure
 
 ```text
-resource-booking-api/
-│
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com.example.booking/
-│   │   │       ├── config/
-│   │   │       │   ├── SecurityConfig.java
-│   │   │       │   ├── JwtService.java
-│   │   │       │   ├── JwtAuthenticationFilter.java
-│   │   │       │   └── CustomUserDetailsService.java
-│   │   │       │
-│   │   │       ├── controller/
-│   │   │       │   ├── AuthController.java
-│   │   │       │   ├── ResourceController.java
-│   │   │       │   └── ReservationController.java
-│   │   │       │
-│   │   │       ├── dto/
-│   │   │       │
-│   │   │       ├── entity/
-│   │   │       │
-│   │   │       ├── exception/
-│   │   │       │   ├── GlobalExceptionHandler.java
-│   │   │       │   └── ResourceNotFoundException.java
-│   │   │       │
-│   │   │       ├── repository/
-│   │   │       │
-│   │   │       ├── service/
-│   │   │       │   ├── ResourceService.java
-│   │   │       │   └── ReservationService.java
-│   │   │       │
-│   │   │       └── ResourceBookingApiApplication.java
-│   │   │
-│   │   └── resources/
-│   │       └── application.properties
+src/
+├── main/
+│   ├── java/
+│   │   └── com/example/booking/
+│   │       ├── config/
+│   │       ├── controller/
+│   │       ├── dto/
+│   │       ├── entity/
+│   │       ├── exception/
+│   │       ├── repository/
+│   │       ├── security/
+│   │       ├── service/
+│   │       └── validation/
 │   │
-│   └── test/
+│   └── resources/
+│       └── application.properties/
 │
-├── pom.xml
-├── README.md
-└── .gitignore
+└── test/
+    └── java/
 ```
+
+---
+
+## 4. Main Features
+
+* JWT-based authentication
+* Role-based access control
+* ADMIN and USER roles
+* Resource CRUD operations
+* Reservation management
+* Reservation ownership
+* Reservation status management
+* Price filtering
+* Status filtering
+* Pagination
+* Sorting
+* Request validation
+* Centralized exception handling
+* MySQL persistence
+* Swagger/OpenAPI documentation
+* Unit/service testing
 
 ---
 
 ## 5. Prerequisites
 
-Before running the application, install:
+Install the following before running the application:
 
-- Java 17 or higher
-- Maven
-- MySQL
-- Git
+* Java 17 or later
+* MySQL 8+
+* Maven or Maven Wrapper
+* Git
 
 Verify Java:
 
@@ -188,10 +135,10 @@ mvn -version
 
 The application uses MySQL.
 
-Create the database:
+Default database:
 
-```sql
-CREATE DATABASE booking_db;
+```text
+booking_db
 ```
 
 The application can also create the database automatically because the JDBC URL contains:
@@ -200,18 +147,41 @@ The application can also create the database automatically because the JDBC URL 
 createDatabaseIfNotExist=true
 ```
 
-### Database Configuration
+### Database Environment Variables
 
-The current local development configuration is:
+Database credentials are not stored directly in `application.properties`.
+
+The application expects the following environment variables:
+
+```text
+DB_USERNAME
+DB_PASSWORD
+```
+
+### Windows Command Prompt
+
+```cmd
+set DB_USERNAME=root
+set DB_PASSWORD=your_mysql_password
+```
+
+### Windows PowerShell
+
+```powershell
+$env:DB_USERNAME="root"
+$env:DB_PASSWORD="your_mysql_password"
+```
+
+The application uses:
 
 ```properties
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.datasource.url=jdbc:mysql://localhost:3306/booking_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Kolkata
-spring.datasource.username=root
-spring.datasource.password=1234
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
 ```
 
-Update the username and password according to your local MySQL installation.
+Update the environment variables according to your local MySQL installation.
 
 ---
 
@@ -240,8 +210,10 @@ Hibernate automatically creates or updates the required database tables based on
 
 JWT configuration is defined in `application.properties`.
 
+The JWT secret is supplied through the `JWT_SECRET` environment variable and is not committed to source control.
+
 ```properties
-jwt.secret=YOUR_BASE64_SECRET
+jwt.secret=${JWT_SECRET}
 jwt.expiration=86400000
 ```
 
@@ -249,6 +221,18 @@ The expiration value:
 
 ```text
 86400000 milliseconds = 24 hours
+```
+
+### Windows Command Prompt
+
+```cmd
+set JWT_SECRET=your_generated_base64_secret
+```
+
+### Windows PowerShell
+
+```powershell
+$env:JWT_SECRET="your_generated_base64_secret"
 ```
 
 JWT tokens are generated after successful authentication and must be supplied to protected endpoints.
@@ -271,18 +255,58 @@ cd resource-booking-api
 
 ### Step 3 – Configure MySQL
 
-Make sure MySQL is running and the database credentials in `application.properties` are correct.
+Make sure MySQL is running.
+
+Configure the following environment variables:
+
+```text
+DB_USERNAME
+DB_PASSWORD
+JWT_SECRET
+```
+
+### Windows Command Prompt
+
+```cmd
+set DB_USERNAME=root
+set DB_PASSWORD=your_mysql_password
+set JWT_SECRET=your_generated_base64_secret
+```
+
+### Windows PowerShell
+
+```powershell
+$env:DB_USERNAME="root"
+$env:DB_PASSWORD="your_mysql_password"
+$env:JWT_SECRET="your_generated_base64_secret"
+```
 
 ### Step 4 – Build the project
+
+Using Maven:
 
 ```bash
 mvn clean package
 ```
 
+Or using the Maven Wrapper on Windows:
+
+```cmd
+mvnw.cmd clean package
+```
+
 ### Step 5 – Run the application
+
+Using Maven:
 
 ```bash
 mvn spring-boot:run
+```
+
+Or using the Maven Wrapper on Windows:
+
+```cmd
+mvnw.cmd spring-boot:run
 ```
 
 The application runs on:
@@ -358,32 +382,32 @@ Authorization: Bearer <JWT_TOKEN>
 
 ### Authentication
 
-| Method | Endpoint | Access |
-|---|---|---|
-| POST | `/auth/login` | Public |
+| Method | Endpoint      | Access |
+| ------ | ------------- | ------ |
+| POST   | `/auth/login` | Public |
 
 ---
 
 ## 13. Resource Endpoints
 
-| Method | Endpoint | Access |
-|---|---|---|
-| GET | `/api/resources` | USER / ADMIN |
-| GET | `/api/resources/{id}` | USER / ADMIN |
-| POST | `/api/resources` | ADMIN |
-| PUT | `/api/resources/{id}` | ADMIN |
-| DELETE | `/api/resources/{id}` | ADMIN |
+| Method | Endpoint              | Access       |
+| ------ | --------------------- | ------------ |
+| GET    | `/api/resources`      | USER / ADMIN |
+| GET    | `/api/resources/{id}` | USER / ADMIN |
+| POST   | `/api/resources`      | ADMIN        |
+| PUT    | `/api/resources/{id}` | ADMIN        |
+| DELETE | `/api/resources/{id}` | ADMIN        |
 
 ---
 
 ## 14. Reservation Endpoints
 
-| Method | Endpoint | Access |
-|---|---|---|
-| POST | `/api/reservations` | USER / ADMIN |
-| GET | `/api/reservations` | USER / ADMIN |
-| PATCH | `/api/reservations/{id}/status` | ADMIN |
-| DELETE | `/api/reservations/{id}` | ADMIN |
+| Method | Endpoint                        | Access       |
+| ------ | ------------------------------- | ------------ |
+| POST   | `/api/reservations`             | USER / ADMIN |
+| GET    | `/api/reservations`             | USER / ADMIN |
+| PATCH  | `/api/reservations/{id}/status` | ADMIN        |
+| DELETE | `/api/reservations/{id}`        | ADMIN        |
 
 ---
 
@@ -436,6 +460,13 @@ Example:
 
 ```http
 GET /api/resources?page=0&size=10
+```
+
+Supported sorting fields:
+
+```text
+id
+name
 ```
 
 ---
@@ -519,15 +550,22 @@ Example request:
 {
   "resourceId": 1,
   "price": 1500.00,
-  "status": "PENDING",
   "startTime": "2026-09-25T10:00:00",
   "endTime": "2026-09-25T12:00:00"
 }
 ```
 
-The user is obtained from the authenticated JWT.
+The authenticated user is obtained from the JWT.
 
-The reservation request does **not** determine the authenticated user.
+The reservation request does not determine the authenticated user.
+
+New reservations are created with:
+
+```text
+PENDING
+```
+
+The reservation status supplied by a client is not used to create a new reservation.
 
 Successful response:
 
@@ -547,12 +585,18 @@ CONFIRMED
 CANCELLED
 ```
 
+New reservations always start with:
+
+```text
+PENDING
+```
+
+Only ADMIN users can update reservation status.
+
 Example:
 
-```json
-{
-  "status": "CONFIRMED"
-}
+```http
+PATCH /api/reservations/1/status?status=CONFIRMED
 ```
 
 ---
@@ -577,9 +621,9 @@ An ADMIN can view reservations belonging to all users.
 
 Reservations can be filtered using:
 
-- `status`
-- `minPrice`
-- `maxPrice`
+* `status`
+* `minPrice`
+* `maxPrice`
 
 ### Filter by Status
 
@@ -605,14 +649,20 @@ GET /api/reservations?maxPrice=2000
 GET /api/reservations?status=CONFIRMED&minPrice=500&maxPrice=2000
 ```
 
+If `minPrice` is greater than `maxPrice`, the API returns:
+
+```text
+400 Bad Request
+```
+
 ---
 
 ## 20. Pagination
 
 Reservation results support pagination using:
 
-- `page`
-- `size`
+* `page`
+* `size`
 
 Example:
 
@@ -627,11 +677,34 @@ page=0 → first page
 size=10 → 10 records per page
 ```
 
+The API accepts:
+
+```text
+page >= 0
+size between 1 and 100
+```
+
+Invalid pagination values return:
+
+```text
+400 Bad Request
+```
+
 ---
 
 ## 21. Sorting
 
-Reservation results support optional Spring Data sorting.
+Reservation results support optional sorting.
+
+Allowed reservation sort fields are:
+
+```text
+id
+price
+status
+startTime
+endTime
+```
 
 Example:
 
@@ -643,6 +716,12 @@ Another example:
 
 ```http
 GET /api/reservations?page=0&size=10&sort=id,desc
+```
+
+Unsupported sort fields return:
+
+```text
+400 Bad Request
 ```
 
 ---
@@ -657,11 +736,11 @@ GET /api/reservations?status=CONFIRMED&minPrice=500&maxPrice=3000&page=0&size=10
 
 This combines:
 
-- Status filtering
-- Minimum price
-- Maximum price
-- Pagination
-- Sorting
+* Status filtering
+* Minimum price
+* Maximum price
+* Pagination
+* Sorting
 
 ---
 
@@ -695,6 +774,12 @@ Successful response:
 
 ```text
 200 OK
+```
+
+A USER attempting this operation receives:
+
+```text
+403 Forbidden
 ```
 
 ---
@@ -781,13 +866,15 @@ The application validates incoming requests using Jakarta Bean Validation.
 
 Examples of validation include:
 
-- Required fields
-- Valid price values
-- Valid resource ID
-- Valid reservation status
-- Valid start time
-- Valid end time
-- Start time must not be after end time
+* Required fields
+* Valid price values
+* Valid resource ID
+* Valid reservation status
+* Valid start time
+* Valid end time
+* Start time must not be after end time
+* Valid pagination values
+* Valid sorting fields
 
 Invalid requests return:
 
@@ -801,11 +888,13 @@ Invalid requests return:
 
 The application uses centralized exception handling through `GlobalExceptionHandler`.
 
+Unexpected server-side exceptions are logged internally and return a generic error message to the client.
+
 ### Common responses
 
 #### 400 Bad Request
 
-Used for invalid request data or validation errors.
+Used for invalid request data, validation errors, invalid pagination, invalid sorting, or invalid filters.
 
 Example:
 
@@ -856,6 +945,20 @@ Example:
 }
 ```
 
+#### 500 Internal Server Error
+
+Unexpected application errors return a generic message:
+
+```json
+{
+  "status": 500,
+  "message": "An unexpected error occurred",
+  "timestamp": "2026-09-30T10:00:00"
+}
+```
+
+Detailed exception information is logged internally and is not exposed to API clients.
+
 ---
 
 ## 29. Swagger / OpenAPI Documentation
@@ -882,11 +985,11 @@ http://localhost:8080/v3/api-docs
 
 Swagger can be used to:
 
-- View available endpoints
-- View request/response schemas
-- Test API endpoints
-- Authenticate using JWT
-- Test different role permissions
+* View available endpoints
+* View request/response schemas
+* Test API endpoints
+* Authenticate using JWT
+* Test different role permissions
 
 ---
 
@@ -918,13 +1021,13 @@ Bearer <your-jwt-token>
 
 The application uses:
 
-- Spring Security
-- JWT authentication
-- BCrypt password encoding
-- Stateless session management
-- Role-based endpoint authorization
-- JWT request filtering
-- Protected API endpoints
+* Spring Security
+* JWT authentication
+* BCrypt password encoding
+* Stateless session management
+* Role-based endpoint authorization
+* JWT request filtering
+* Protected API endpoints
 
 CSRF is disabled because the application uses stateless JWT authentication.
 
@@ -935,6 +1038,24 @@ The security configuration permits access to:
 /swagger-ui/**
 /v3/api-docs/**
 /swagger-ui.html
+```
+
+Resource permissions are explicitly configured by HTTP method:
+
+```text
+GET     → USER / ADMIN
+POST    → ADMIN
+PUT     → ADMIN
+DELETE  → ADMIN
+```
+
+Reservation permissions are:
+
+```text
+GET     → USER / ADMIN
+POST    → USER / ADMIN
+PATCH   → ADMIN
+DELETE  → ADMIN
 ```
 
 Other application endpoints require authentication according to their configured roles.
@@ -969,62 +1090,67 @@ The application was tested using Swagger/OpenAPI with both ADMIN and USER accoun
 
 ### Authentication Testing
 
-- Valid ADMIN login
-- Valid USER login
-- Invalid credentials
-- Protected endpoint without JWT
+* Valid ADMIN login
+* Valid USER login
+* Invalid credentials
+* Protected endpoint without JWT
 
 ### Authorization Testing
 
-- ADMIN resource creation
-- ADMIN resource update
-- ADMIN resource deletion
-- USER resource read access
-- USER resource creation rejection
-- USER resource update rejection
-- USER resource deletion rejection
+* ADMIN resource creation
+* ADMIN resource update
+* ADMIN resource deletion
+* USER resource read access
+* USER resource creation rejection
+* USER resource update rejection
+* USER resource deletion rejection
 
 ### Reservation Testing
 
-- USER reservation creation
-- ADMIN reservation creation
-- USER own reservation retrieval
-- ADMIN all reservation retrieval
-- Reservation status update
-- Reservation deletion
-- Reservation ownership restrictions
+* USER reservation creation
+* ADMIN reservation creation
+* USER own reservation retrieval
+* ADMIN all reservation retrieval
+* Reservation status update
+* USER reservation status update rejection
+* Reservation deletion
+* Reservation ownership restrictions
+* New reservations created with PENDING status
 
 ### Validation Testing
 
-- Missing required fields
-- Negative price
-- Invalid resource ID
-- Invalid reservation times
-- Invalid reservation data
+* Missing required fields
+* Negative price
+* Invalid resource ID
+* Invalid reservation times
+* Invalid reservation data
+* Invalid pagination
+* Invalid sorting
+* Invalid price range
 
 ### Filtering / Pagination / Sorting
 
-- Status filtering
-- Minimum price filtering
-- Maximum price filtering
-- Combined filters
-- Pagination
-- Sorting
+* Status filtering
+* Minimum price filtering
+* Maximum price filtering
+* Combined filters
+* Pagination
+* Sorting
 
 ---
 
 ## 34. HTTP Status Codes
 
-| Status | Meaning |
-|---|---|
-| 200 | Successful request |
-| 201 | Resource/reservation created |
-| 204 | Successful deletion |
-| 400 | Invalid request / validation error |
-| 401 | Authentication required / invalid credentials |
-| 403 | Insufficient permissions |
-| 404 | Resource or reservation not found |
-| 500 | Unexpected server error |
+| Status | Meaning                                       |
+| ------ | --------------------------------------------- |
+| 200    | Successful request                            |
+| 201    | Resource/reservation created                  |
+| 204    | Successful deletion                           |
+| 400    | Invalid request / validation error            |
+| 401    | Authentication required / invalid credentials |
+| 403    | Insufficient permissions                      |
+| 404    | Resource or reservation not found             |
+| 500    | Unexpected server error                       |
 
 ---
 
@@ -1036,28 +1162,38 @@ Main configuration file:
 src/main/resources/application.properties
 ```
 
-Example local configuration:
+The committed configuration uses environment variables for sensitive values:
 
 ```properties
 spring.application.name=resource-booking-api
 
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.datasource.url=jdbc:mysql://localhost:3306/booking_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Kolkata
-spring.datasource.username=root
-spring.datasource.password=1234
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
 
 spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 spring.jpa.hibernate.ddl-auto=update
 
-jwt.secret=YOUR_BASE64_SECRET
+jwt.secret=${JWT_SECRET}
 jwt.expiration=86400000
 
 springdoc.swagger-ui.path=/swagger-ui.html
 ```
 
-For production environments, database credentials and JWT secrets should be supplied using environment variables or a secure secrets-management mechanism instead of committing sensitive values to source control.
+Required environment variables:
+
+```text
+DB_USERNAME
+DB_PASSWORD
+JWT_SECRET
+```
+
+Sensitive database credentials and JWT secrets should not be committed to source control.
+
+For production environments, secrets should be supplied through environment variables or a secure secrets-management mechanism.
 
 ---
 
@@ -1067,6 +1203,12 @@ Build the application using:
 
 ```bash
 mvn clean package
+```
+
+On Windows using the Maven Wrapper:
+
+```cmd
+mvnw.cmd clean package
 ```
 
 Run the generated JAR:
@@ -1086,64 +1228,73 @@ A typical usage flow is:
 ```text
 1. Start MySQL
        ↓
-2. Start Spring Boot application
+2. Configure DB_USERNAME, DB_PASSWORD and JWT_SECRET
        ↓
-3. Login using /auth/login
+3. Start Spring Boot application
        ↓
-4. Receive JWT token
+4. Login using /auth/login
        ↓
-5. Authorize using JWT
+5. Receive JWT token
        ↓
-6. Access protected resources
+6. Authorize using JWT
        ↓
-7. Create reservations
+7. Access protected resources
        ↓
-8. Retrieve reservations
+8. Create reservations
        ↓
-9. Apply filters/pagination/sorting
+9. Retrieve reservations
        ↓
-10. ADMIN manages resources and reservation status
+10. Apply filters/pagination/sorting
+       ↓
+11. ADMIN manages resources and reservation status
 ```
 
 ---
 
 ## 38. Security Notes
 
-- Passwords are stored using BCrypt hashing.
-- JWT is used for stateless authentication.
-- Protected endpoints require authentication.
-- USER access is restricted according to role.
-- USER reservation ownership is determined from the authenticated JWT user.
-- ADMIN has broader access to resources and reservations.
-- Sensitive production credentials should not be committed to source control.
+* Passwords are stored using BCrypt hashing.
+* JWT is used for stateless authentication.
+* Protected endpoints require authentication.
+* USER access is restricted according to role.
+* USER reservation ownership is determined from the authenticated JWT user.
+* New reservations are created with `PENDING` status.
+* Only ADMIN users can update reservation status.
+* ADMIN has broader access to resources and reservations.
+* Database credentials are supplied through environment variables.
+* JWT secrets are supplied through environment variables.
+* Sensitive credentials and secrets should not be committed to source control.
+* Unexpected server-side exception details are logged internally and are not exposed to API clients.
 
 ---
 
 ## 39. Assignment Requirements Coverage
 
-| Requirement | Implementation |
-|---|---|
-| JWT login | `POST /auth/login` |
-| ADMIN / USER roles | Spring Security RBAC |
-| ADMIN resource CRUD | Resource controller/service |
-| USER resource read-only | Security configuration |
-| USER reservation creation | Reservation API |
-| USER own reservations | User-based filtering |
-| JWT-based user identity | `@AuthenticationPrincipal` |
-| Reservation statuses | PENDING, CONFIRMED, CANCELLED |
-| Decimal price | `BigDecimal` |
-| Status filtering | Reservation query |
-| Minimum price filtering | Reservation query |
-| Maximum price filtering | Reservation query |
-| Pagination | Spring `Pageable` |
-| Sorting | Spring `Pageable` / `Sort` |
-| ADMIN all reservations | Role-based service filtering |
-| Validation | Jakarta Bean Validation |
-| Error handling | Global exception handler |
-| MySQL | Spring Data JPA / Hibernate |
-| API documentation | Swagger / OpenAPI |
-| Seed users | ADMIN and USER test accounts |
-| Setup documentation | README |
+| Requirement                       | Implementation                                 |
+| --------------------------------- | ---------------------------------------------- |
+| JWT login                         | `POST /auth/login`                             |
+| ADMIN / USER roles                | Spring Security RBAC                           |
+| ADMIN resource CRUD               | Resource controller/service                    |
+| USER resource read-only           | Security configuration                         |
+| USER reservation creation         | Reservation API                                |
+| USER own reservations             | User-based filtering                           |
+| JWT-based user identity           | `@AuthenticationPrincipal`                     |
+| Reservation statuses              | PENDING, CONFIRMED, CANCELLED                  |
+| Decimal price                     | `BigDecimal`                                   |
+| Status filtering                  | Reservation query                              |
+| Minimum price filtering           | Reservation query                              |
+| Maximum price filtering           | Reservation query                              |
+| Pagination                        | Spring `Pageable`                              |
+| Sorting                           | Spring `Pageable` / `Sort` with allowed fields |
+| ADMIN all reservations            | Role-based service filtering                   |
+| Validation                        | Jakarta Bean Validation                        |
+| Error handling                    | Global exception handler                       |
+| Generic unexpected error response | Centralized logging and generic 500 response   |
+| MySQL                             | Spring Data JPA / Hibernate                    |
+| API documentation                 | Swagger / OpenAPI                              |
+| Seed users                        | ADMIN and USER test accounts                   |
+| Environment-based secrets         | DB credentials and JWT secret                  |
+| Setup documentation               | README                                         |
 
 ---
 
@@ -1160,5 +1311,3 @@ Developed as part of the **EXELYNT Backend Developer Assignment**.
 **Authentication:** JWT
 
 **Authorization:** Spring Security RBAC
-
----

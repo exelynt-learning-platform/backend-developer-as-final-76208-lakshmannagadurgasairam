@@ -29,15 +29,20 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final ResourceRepository resourceRepository;
 
-    public ReservationResponse createReservation(CreateReservationRequest request, User currentUser) {
+    public ReservationResponse createReservation(
+            CreateReservationRequest request,
+            User currentUser) {
+
         Resource resource = resourceRepository.findById(request.getResourceId())
-                .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + request.getResourceId()));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Resource not found with id: " + request.getResourceId()));
 
         Reservation reservation = Reservation.builder()
-                .user(currentUser) // Takes identity strictly from JWT
+                .user(currentUser)
                 .resource(resource)
                 .price(request.getPrice())
-                .status(request.getStatus() != null ? request.getStatus() : ReservationStatus.PENDING)
+                .status(ReservationStatus.PENDING)
                 .startTime(request.getStartTime())
                 .endTime(request.getEndTime())
                 .build();
@@ -46,57 +51,113 @@ public class ReservationService {
     }
 
     public Page<ReservationResponse> getReservations(
-            User currentUser, ReservationStatus status, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
+            User currentUser,
+            ReservationStatus status,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            Pageable pageable) {
 
-        // ADMIN views all; USER is restricted to their own ID
-        Long filterUserId = (currentUser.getRole() == Role.ROLE_ADMIN) ? null : currentUser.getId();
+        // ADMIN views all reservations; USER views only their own reservations
+        Long filterUserId =
+                (currentUser.getRole() == Role.ROLE_ADMIN)
+                        ? null
+                        : currentUser.getId();
 
         Specification<Reservation> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             if (filterUserId != null) {
-                predicates.add(cb.equal(root.get("user").get("id"), filterUserId));
-            }
-            if (status != null) {
-                predicates.add(cb.equal(root.get("status"), status));
-            }
-            if (minPrice != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("price"), minPrice));
-            }
-            if (maxPrice != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("price"), maxPrice));
+                predicates.add(
+                        cb.equal(
+                                root.get("user").get("id"),
+                                filterUserId
+                        )
+                );
             }
 
-            return cb.and(predicates.toArray(new Predicate[0]));
+            if (status != null) {
+                predicates.add(
+                        cb.equal(
+                                root.get("status"),
+                                status
+                        )
+                );
+            }
+
+            if (minPrice != null) {
+                predicates.add(
+                        cb.greaterThanOrEqualTo(
+                                root.get("price"),
+                                minPrice
+                        )
+                );
+            }
+
+            if (maxPrice != null) {
+                predicates.add(
+                        cb.lessThanOrEqualTo(
+                                root.get("price"),
+                                maxPrice
+                        )
+                );
+            }
+
+            return cb.and(
+                    predicates.toArray(new Predicate[0])
+            );
         };
 
-        return reservationRepository.findAll(spec, pageable).map(this::mapToResponse);
+        return reservationRepository
+                .findAll(spec, pageable)
+                .map(this::mapToResponse);
     }
 
-    public ReservationResponse updateReservationStatus(Long id, ReservationStatus status, User currentUser) {
-        Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Reservation not found with id: " + id));
+    public ReservationResponse updateReservationStatus(
+            Long id,
+            ReservationStatus status,
+            User currentUser) {
 
-        if (currentUser.getRole() != Role.ROLE_ADMIN && !reservation.getUser().getId().equals(currentUser.getId())) {
-            throw new AccessDeniedException("You can only modify your own reservations.");
+        // Only ADMIN can update reservation status
+        if (currentUser.getRole() != Role.ROLE_ADMIN) {
+            throw new AccessDeniedException(
+                    "Only ADMIN can update reservation status."
+            );
         }
 
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Reservation not found with id: " + id));
+
         reservation.setStatus(status);
-        return mapToResponse(reservationRepository.save(reservation));
+
+        return mapToResponse(
+                reservationRepository.save(reservation)
+        );
     }
 
-    public void deleteReservation(Long id, User currentUser) {
-        Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Reservation not found with id: " + id));
+    public void deleteReservation(
+            Long id,
+            User currentUser) {
 
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Reservation not found with id: " + id));
+
+        // Only ADMIN can delete reservations
         if (currentUser.getRole() != Role.ROLE_ADMIN) {
-            throw new AccessDeniedException("Only ADMIN can delete reservations.");
+            throw new AccessDeniedException(
+                    "Only ADMIN can delete reservations."
+            );
         }
 
         reservationRepository.delete(reservation);
     }
 
-    private ReservationResponse mapToResponse(Reservation reservation) {
+    private ReservationResponse mapToResponse(
+            Reservation reservation) {
+
         return ReservationResponse.builder()
                 .id(reservation.getId())
                 .userId(reservation.getUser().getId())
